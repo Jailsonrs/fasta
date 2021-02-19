@@ -52,11 +52,11 @@ if  __name__ == "__main__":
     prob_mutar = args.prob_mutar
     prob_gc = args.prob_gc
 
-    with open(args.fasta_file, 'rU') as fastahandle, open ('output2.fna', 'w') as output_handle:
+    with open(args.fasta_file, 'rU') as fastahandle, open ('output_mutado.fna', 'w') as output_handle, open ('output_concat.fna', 'w') as output_concat:
       for seq_record in SeqIO.parse(fastahandle, 'fasta'):
        print(seq_record.id)
        mutatedSequence = substituicao(seq_record.seq,prob_mutar,prob_gc)
-       myID=seq_record.id + '_mut'
+       myID = seq_record.id + '_orig_mut'
        print(myID)
        if len(mutatedSequence) == len(seq_record.seq):
            seqObj=SeqRecord(
@@ -65,8 +65,16 @@ if  __name__ == "__main__":
                    name=myID,
                    description='mutated sequence based on: '+myID
                    )
-           SeqIO.write(seqObj,output_handle, 'fasta')
+                           
+           ##SeqIO.write(seqObj, output_handle, 'fasta')
+           final = Seq(str(seq_record.seq+seqObj.seq))
+           seqObj2=SeqRecord(
+                   final,
+                   id=myID+'2',
+                   name=myID+'2',
+                   description='mutated_2 sequence based on: '+myID
+                   )
+           SeqIO.write(seqObj, output_handle,'fasta')
+           SeqIO.write(seqObj2,output_concat,'fasta')
        else:
            print("Não está correto, o comprimento da sequencia original nao é o mesmo da sequencia mutada")
-    ##system("touch fastahandle")       
-    system("cat GCF_000146045.2_R64_genomic.fna >> output2.fna")
